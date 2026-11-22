@@ -1,0 +1,1 @@
+"""FujiFrame local photography API."""

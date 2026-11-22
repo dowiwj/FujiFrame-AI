@@ -1,0 +1,25 @@
+# Local environments and build output
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+node_modules/
+dist/
+.cache/
+*.log
+
+# Local configuration, test photos and model weights
+.env
+.env.*
+!.env.example
+uploads/
+samples/private/
+models/weights/
+models/**/*.bin
+*.ckpt
+*.pt
+*.pth
+*.safetensors
+*.onnx
+*.gguf
