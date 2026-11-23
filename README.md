@@ -1,6 +1,6 @@
 # FujiFrame AI
 
-FujiFrame AI is a local photography workspace. You can preview one JPEG or PNG, send it to a local FastAPI service, and inspect its encoded dimensions, format and exact file size. AI critique and color editing are planned for later stages.
+FujiFrame AI is a local photography workspace with a light editorial Gallery and a dark Studio. Choose one JPEG or PNG to preview it and automatically read its format, encoded dimensions and file size through the local FastAPI service. Switching views preserves the selection; clicking the preview opens a lightbox. Film recipes, camera EXIF, histogram analysis and editing are not implemented yet. Artistic scoring is not part of the product direction.
 
 ## Run on Windows
 
@@ -24,12 +24,12 @@ npm.cmd ci
 npm.cmd run dev
 ```
 
-Open [FujiFrame Studio](http://127.0.0.1:5173). Choose **Chọn ảnh** or drop a file onto the preview, then choose **Đọc thông số**. Use **Đổi ảnh** to inspect another photo. On subsequent runs use `npm.cmd run dev` from `frontend`. Stop each service with `Ctrl+C`.
+Open [FujiFrame Studio](http://127.0.0.1:5173). Choose **Chọn ảnh** or drop a file onto the preview; metadata is read automatically. Use **Đổi ảnh** to inspect another photo, **Gỡ ảnh** to clear it, or **Thử đọc lại** to retry a failed request. On subsequent runs use `npm.cmd run dev` from `frontend`. Stop each service with `Ctrl+C`.
 
 ## How the upload works
 
 1. React creates a browser-local preview of the selected file. Replacing the file clears the previous result and cancels any pending upload from the interface.
-2. Pressing **Đọc thông số** sends a single multipart field named `file` to `POST /api/images/upload`. Vite forwards `/api` requests to FastAPI on loopback.
+2. Selecting an image sends a single multipart field named `file` to `POST /api/images/upload`. Vite forwards `/api` requests to FastAPI on loopback.
 3. The Backend accepts files up to **32 MiB** and **64,000,000 pixels**. Pillow identifies the format from the content, checks the file structure and decodes the image before returning metadata. Width and height describe the stored pixel grid before EXIF display rotation.
 4. File handling is scoped to the request. The multipart parser may spool large uploads to a temporary file. The app keeps no image library or upload history. Reloading the page clears the selection.
 
