@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ImageUpload from "./components/ImageUpload.jsx";
+import Gallery from "./components/Gallery.jsx";
 
 export default function App() {
   const [view, setView] = useState("gallery");
@@ -19,7 +20,8 @@ export default function App() {
             <h1>{view === "gallery" ? "Gallery" : "AI Studio"}</h1></div>
           <p>{view === "gallery" ? "Những khoảnh khắc, trong ánh sáng của riêng mình." : "Xem ảnh trọn vẹn. Hiểu rõ từng thông số."}</p>
         </div>
-        <ImageUpload view={view} />
+        <div hidden={view !== "gallery"}><Gallery /></div>
+        <div hidden={view !== "studio"}><ImageUpload view="studio" /></div>
       </main>
       <footer className="shell site-footer"><span>FUJIFRAME — PERSONAL PHOTOGRAPHY</span><span>Ảnh của bạn. Góc nhìn của bạn.</span></footer>
     </div>

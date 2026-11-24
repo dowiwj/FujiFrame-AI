@@ -70,7 +70,27 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(44px, 5
 .lightbox-toolbar > span { overflow-wrap: anywhere; }
 .lightbox-toolbar button { background: none; border: 0; padding: 12px; white-space: nowrap; }
 .lightbox img { display: block; width: 100%; max-height: 65dvh; object-fit: contain; }
+.gallery.is-dragging { outline: 1px dashed var(--text); outline-offset: 8px; }
+.gallery-toolbar { flex-wrap: wrap; }
+.gallery-toolbar > div { display: flex; gap: 12px; }
+.gallery-controls { align-items: center; flex-wrap: wrap; }
+.collection-filter { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.collection-filter select { min-height: 40px; max-width: min(240px, 45vw); padding: 6px 30px 6px 10px; color: var(--text); background: var(--bg); border: 1px solid var(--line); font: inherit; }
+.collection-filter select:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.gallery-empty { min-height: 360px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px dashed var(--line); }
+.gallery-masonry { columns: 3; column-gap: 28px; }
+.gallery-photo { break-inside: avoid; margin: 0 0 28px; }
+.gallery-photo img { display: block; width: 100%; height: auto; background: var(--stage); opacity: .4; }
+.gallery-photo img.is-loaded { opacity: 1; animation: gallery-appear .3s ease-out; }
+.gallery-photo figcaption { display: flex; justify-content: space-between; gap: 12px; padding-top: 12px; font-size: 11px; color: var(--muted); }
+.gallery-photo figcaption span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.gallery-photo figcaption span:last-child { white-space: nowrap; }
+.gallery-photo-actions { display: flex; align-items: baseline; gap: 12px; flex-shrink: 0; }
+.gallery-photo-actions .remove-button { font-size: 11px; padding: 0 4px; min-height: 32px; }
+@keyframes gallery-appear { from { opacity: .4; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .gallery-photo img.is-loaded { animation: none; } }
 @media (max-width: 960px) {
+  .gallery-masonry { columns: 2; }
   .shell { width: calc(100% - 48px); }
   .local-label { display: none; }
   .site-header { justify-content: space-between; }
@@ -78,6 +98,7 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(44px, 5
   .theme-studio .inspector { padding-left: 20px; }
 }
 @media (max-width: 700px) {
+  .gallery-masonry { columns: 1; }
   .shell { width: calc(100% - 32px); }
   .site-header { min-height: 74px; gap: 16px; }
   .wordmark { font-size: 16px; }
@@ -92,3 +113,25 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(44px, 5
   .metadata { grid-template-columns: 1fr 1fr; }
   .site-footer { flex-direction: column; gap: 10px; margin-top: 40px; }
 }
+.gallery-exif { font: 11px/1.8 "Segoe UI", sans-serif; color: var(--muted); margin: 8px 0 0; overflow-wrap: anywhere; }
+.gallery-lightbox { background: #111; color: #eee; --muted: #aaa; border: 0; width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; padding: 24px; animation: gallery-appear 200ms ease-out; }
+.gallery-lightbox::backdrop { background: #111; }
+.gallery-lightbox-toolbar { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+.gallery-lightbox button { background: transparent; border: 0; min-width: 44px; min-height: 44px; font-size: 24px; }
+.gallery-lightbox-image { height: 65dvh; display: grid; place-items: center; }
+.gallery-lightbox-image img { max-width: 100%; max-height: 65dvh; object-fit: contain; }
+.gallery-lightbox > p { text-align: center; overflow-wrap: anywhere; }
+.photo-journal { max-width: 640px; margin: 24px auto; border-top: 1px solid #444; padding-top: 20px; overflow-wrap: anywhere; }
+.photo-journal h2 { font: 400 22px Georgia, serif; margin: 0; }
+.photo-journal fieldset { border: 0; padding: 0; margin: 16px 0; min-width: 0; }
+.photo-journal label { display: grid; gap: 8px; margin-bottom: 16px; font-size: 13px; }
+.photo-journal input, .photo-journal textarea { width: 100%; min-width: 0; background: #1c1c1c; color: #eee; border: 1px solid #666; padding: 12px; font: inherit; border-radius: 0; }
+.photo-journal textarea { resize: vertical; }
+.photo-journal input:focus-visible, .photo-journal textarea:focus-visible { outline: 2px solid #eee; outline-offset: 2px; }
+.photo-journal button { font-size: 14px; border: 1px solid #666; padding: 8px 16px; }
+.journal-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.journal-description { white-space: pre-wrap; }
+.journal-label { display: inline-block; min-width: 110px; color: #aaa; font-size: 12px; }
+.photo-journal [role="status"] { color: #aaa; font-size: 13px; }
+@media (max-width: 700px) { .gallery-controls { width: 100%; justify-content: space-between; } .collection-filter { width: 100%; justify-content: space-between; } }
+@media (prefers-reduced-motion: reduce) { .gallery-lightbox { animation: none; } }
