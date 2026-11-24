@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
-import { clearPhotos, deletePhoto, listPhotos, preparePhoto, savePhoto, storageMessage, updateJournal } from "../services/gallery.js";
+import { clearPhotos, deletePhoto, listPhotos, preparePhoto, savePhoto, storageMessage, updateJournal, updateFilmRecipe } from "../services/gallery.js";
 import GalleryLightbox from "./GalleryLightbox.jsx";
 import { formatExif } from "../services/exif.js";
 
@@ -66,7 +66,7 @@ export default function Gallery() {
     reload();
     const updates = new BroadcastChannel("fujiframe-gallery");
     channel.current = updates;
-    updates.onmessage = () => { openRequest.current += 1; setExpanded(null); reload(); };
+    updates.onmessage = reload;
     window.addEventListener("focus", reload);
     return () => { refreshId.current += 1; openRequest.current += 1; updates.close(); window.removeEventListener("focus", reload); };
   }, [refresh]);
@@ -151,8 +151,17 @@ export default function Gallery() {
 
   async function saveJournal(id, values) {
     const updated = await updateJournal(id, values);
+    applyPhotoUpdate(updated);
+  }
+
+  async function saveRecipe(id, values) {
+    const updated = await updateFilmRecipe(id, values);
+    applyPhotoUpdate(updated);
+  }
+
+  function applyPhotoUpdate(updated) {
     refreshId.current += 1;
-    setPhotos(current => current.map(photo => photo.id === id ? updated : photo));
+    setPhotos(current => current.map(photo => photo.id === updated.id ? updated : photo));
     channel.current?.postMessage("changed");
   }
 
@@ -188,6 +197,6 @@ export default function Gallery() {
     <p className="request-status" role="status">{status}</p>
     {errors.length > 0 && <div className="error" role="alert">{errors.map((message, index) => <p key={index}>{message}</p>)}{!ready && <button className="read-button" onClick={() => { setErrors([]); void refresh().catch(error => setErrors([storageMessage(error)])); }}>Thử lại</button>}</div>}
     <p className="session-note">Ảnh được lưu trong trình duyệt tại địa chỉ này. Xóa dữ liệu trang web sẽ xóa thư viện ảnh.</p>
-    {expanded && <GalleryLightbox photos={photos} initialId={expanded.photo.id} onClose={closeLightbox} onSaveJournal={saveJournal} />}
+    {expanded && <GalleryLightbox photos={photos} initialId={expanded.photo.id} onClose={closeLightbox} onSaveJournal={saveJournal} onSaveRecipe={saveRecipe} />}
   </section>;
 }

@@ -1,5 +1,6 @@
 import { readExif } from "./exif.js";
 import { normalizeJournal } from "./journal.js";
+import { normalizeFilmRecipe } from "./filmRecipe.js";
 const DATABASE = "fujiframe-gallery";
 let connection;
 
@@ -69,15 +70,22 @@ export function deletePhoto(id) {
   });
 }
 
-export async function updateJournal(id, values) {
-  const journal = normalizeJournal(values);
+export function updateJournal(id, values) {
+  return updatePhotoDetails(id, { journal: normalizeJournal(values) });
+}
+
+export function updateFilmRecipe(id, values) {
+  return updatePhotoDetails(id, { recipe: normalizeFilmRecipe(values) });
+}
+
+async function updatePhotoDetails(id, details) {
   let updated;
   await transact(["photos"], "readwrite", tx => {
     const store = tx.objectStore("photos");
     const request = store.get(id);
     request.onsuccess = () => {
       if (!request.result) return;
-      updated = { ...request.result, journal };
+      updated = { ...request.result, ...details };
       store.put(updated);
     };
   });

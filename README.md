@@ -1,16 +1,24 @@
 # FujiFrame AI
 
-FujiFrame AI is a local photography workspace with a light editorial Gallery and a dark Studio. The Gallery stores multiple JPEG, PNG and WebP originals in IndexedDB and displays thumbnails in a responsive masonry layout. It reads available camera EXIF locally and supports manually entered photo journals. The Studio reads one JPEG or PNG through the local FastAPI service. Switching views preserves the Studio selection, and both views support a lightbox. Film recipes, collections, histogram analysis and image editing are not implemented yet.
+FujiFrame AI is a local photography workspace with a light editorial Gallery and a dark Studio. The Gallery stores multiple JPEG, PNG and WebP originals in IndexedDB and displays thumbnails in a responsive masonry layout. It reads available camera EXIF locally and supports manually entered photo journals, collection filtering and Film Recipes. The Studio reads one JPEG or PNG through the local FastAPI service. Switching views preserves the Studio selection, and both views support a lightbox. Histogram analysis and image editing are not implemented yet.
 
 ## Current progress
 
 - Phase 1 foundation: local Gallery import and storage, thumbnails, loading/error states, and available camera/lens/exposure EXIF. Responsive CSS is present; visual regression verification is still pending.
-- Phase 2 in progress: Gallery lightbox with previous/next controls, manual photo journals, and collection assignment/filtering. Film Recipe entries remain a next step.
+- Phase 2 in progress: Gallery lightbox with previous/next controls, manual photo journals, collection assignment/filtering and manual Film Recipes. Dedicated photo pages and further portfolio polish remain future work.
 - Phase 3 onward: Studio currently reports format, dimensions and file size only. No technical image analysis or machine-learning model is implemented.
 
 Open a Gallery photo, scroll below the image, and choose **Chỉnh sửa nhật ký** to enter a title, collection, location or description. **Lưu nhật ký** persists these fields in the browser; **Hủy** discards the form draft. Each photo can belong to one named collection; the Gallery filter lists collections that currently contain photos. Empty titles fall back to the original filename. Journal values are explicitly user-entered and stored separately from extracted EXIF; saving a journal never rewrites the original image. Save before navigating to another photo or closing the lightbox. Other open Gallery tabs are notified after saving.
 
 EXIF extraction currently includes camera make/model, lens, focal length, aperture, shutter speed, ISO and capture date when present. Missing values are omitted. GPS and Fujifilm recipes are not extracted or inferred.
+
+### Film Recipe journal
+
+In the Gallery lightbox, scroll below the photo journal and choose **Thêm recipe**. Enter only known settings supported by your camera, then choose **Lưu recipe**. All fields are optional: Film Simulation, Dynamic Range, White Balance, WB Shift, Highlight/Shadow Tone, Color, Sharpness, Noise Reduction, Grain Effect, Color Chrome Effect, Color Chrome FX Blue and Clarity. A recipe name and notes about post-processing can also be recorded. Clear all fields and save to remove the recipe entry without removing the photo.
+
+Recipes store user-entered text with explicit `manual` provenance, separately from EXIF and journal data. Unknown fields are omitted; zero and signed values are preserved. Settings are not validated against a camera-specific capability database. No settings are inferred from image colors, no Fujifilm MakerNotes are decoded, and saving does not apply color adjustments or rewrite the original file. Light and post-processing can also affect the final colors.
+
+The lightbox asks before abandoning unsaved recipe edits and prevents navigation while a recipe save is pending. Browser reloads can still discard drafts. Saved recipes persist in the same browser storage as the Gallery. Concurrent recipe edits in different tabs use the last successful save; they are not merged.
 
 ## Run on Windows
 

@@ -131,6 +131,13 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(44px, 5
 .photo-journal button { font-size: 14px; border: 1px solid #666; padding: 8px 16px; }
 .journal-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .journal-description { white-space: pre-wrap; }
+.recipe-fields, .recipe-values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }
+.recipe-notes { grid-column: 1 / -1; }
+.recipe-values { margin: 20px 0; gap: 18px 20px; }
+.recipe-values dt { color: #aaa; font-size: 12px; }
+.recipe-values dd { margin: 6px 0 0; font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.film-recipe [role="alert"] { color: #ffb4a5; }
+@media (max-width: 500px) { .recipe-fields, .recipe-values { grid-template-columns: minmax(0, 1fr); } }
 .journal-label { display: inline-block; min-width: 110px; color: #aaa; font-size: 12px; }
 .photo-journal [role="status"] { color: #aaa; font-size: 13px; }
 @media (max-width: 700px) { .gallery-controls { width: 100%; justify-content: space-between; } .collection-filter { width: 100%; justify-content: space-between; } }
