@@ -4,6 +4,8 @@ from typing import BinaryIO
 
 from PIL import Image, UnidentifiedImageError
 
+from .histogram import HistogramAnalysis, analyze_histogram
+
 MAX_FILE_BYTES = 32 * 1024 * 1024
 MAX_PIXELS = 64_000_000
 SUPPORTED_FORMATS = ("JPEG", "PNG")
@@ -27,6 +29,7 @@ class ImageMetadata:
     width: int
     height: int
     size_bytes: int
+    analysis: HistogramAnalysis
 
 
 def inspect_image(stream: BinaryIO) -> ImageMetadata:
@@ -49,6 +52,7 @@ def inspect_image(stream: BinaryIO) -> ImageMetadata:
         stream.seek(0)
         with Image.open(stream, formats=SUPPORTED_FORMATS) as image:
             image.load()
+            analysis = analyze_histogram(image)
     except Image.DecompressionBombError as error:
         raise ImageLimitError("Độ phân giải ảnh vượt quá 64 megapixel.") from error
     except UnidentifiedImageError as error:
@@ -58,4 +62,4 @@ def inspect_image(stream: BinaryIO) -> ImageMetadata:
     except (OSError, SyntaxError, ValueError) as error:
         raise InvalidImageError("Tệp ảnh bị hỏng hoặc thiếu dữ liệu.") from error
 
-    return ImageMetadata(image_format, width, height, size_bytes)
+    return ImageMetadata(image_format, width, height, size_bytes, analysis)

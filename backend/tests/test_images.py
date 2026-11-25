@@ -33,7 +33,22 @@ def test_metadata_comes_from_file_contents(client, image_format):
     data = make_image(image_format)
     response = upload(client, data)
     assert response.status_code == 200
-    assert response.json() == {
+    result = response.json()
+    analysis = result.pop("analysis")
+    assert analysis["pixel_count"] == 1200
+    exposure = analysis["exposure"]
+    assert sum(exposure[band]["pixel_count"] for band in (
+        "shadows", "midtones", "highlights"
+    )) == 1200
+    assert exposure["midtones"] == {
+        "minimum": 64, "maximum": 191, "pixel_count": 1200, "fraction": 1.0,
+    }
+    assert exposure["near_black"]["fraction"] == 0
+    assert exposure["near_white"]["fraction"] == 0
+    for channel in ("red", "green", "blue", "brightness"):
+        assert len(analysis[channel]) == 256
+        assert sum(analysis[channel]) == 1200
+    assert result == {
         "format": image_format,
         "width": 40,
         "height": 30,
