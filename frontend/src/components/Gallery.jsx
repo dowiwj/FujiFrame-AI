@@ -27,6 +27,7 @@ const GalleryPhoto = memo(function GalleryPhoto({ photo, onOpen, onRemove, busy 
     <figcaption>
       <span>{photo.journal?.title || photo.name}</span>
       <span className="gallery-photo-actions">
+        <a href={`#photo/${photo.id}`} aria-label={`Chi tiết ảnh ${photo.journal?.title || photo.name}`}>Chi tiết</a>
         <span>{photo.width} × {photo.height}</span>
         <button type="button" className="remove-button" disabled={busy}
           aria-label={`Xóa ảnh ${photo.name}`} onClick={() => onRemove(photo)}>Xóa</button>

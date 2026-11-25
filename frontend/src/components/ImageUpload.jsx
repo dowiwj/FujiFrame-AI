@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { inspectImage } from "../services/images.js";
 import PhotoLightbox from "./PhotoLightbox.jsx";
+import HistogramPanel from "./HistogramPanel.jsx";
 
 const MAX_FILE_BYTES = 32 * 1024 * 1024;
 const number = new Intl.NumberFormat("vi-VN");
@@ -53,6 +54,7 @@ export default function ImageUpload({ view }) {
     const controller = new AbortController();
     activeRequest.current = controller;
     setLoading(true);
+    setMetadata(null);
     setError("");
     try {
       const result = await inspectImage(file, controller.signal);
@@ -161,13 +163,13 @@ export default function ImageUpload({ view }) {
             ))}
           </dl>
           <p className="request-status" role="status">
-            {loading ? "Đang đọc thông số ảnh…" : metadata ? "Đã đọc thông số từ tệp gốc." : "Thông số được đọc tự động khi chọn ảnh."}
+            {loading ? "Đang đọc và phân tích ảnh…" : metadata ? "Đã đọc thông số và phân tích pixel ảnh." : "Thông số được đọc tự động khi chọn ảnh."}
           </p>
           {error && <p className="error" role="alert">{error}</p>}
           {error && selection && <button className="read-button" disabled={loading} onClick={() => readMetadata()}>Thử đọc lại</button>}
           {view === "studio" && <>
             <p className="inspector-note">Camera, lens và thông số chụp chưa được hỗ trợ. Ảnh gốc được giữ nguyên.</p>
-            <section className="future-section"><h3>Phân tích kỹ thuật</h3><p>Histogram và gợi ý chỉnh ảnh sẽ có trong giai đoạn tiếp theo.</p></section>
+            <HistogramPanel analysis={metadata?.analysis} loading={loading} error={error} />
             <section className="future-section"><h3>Điều chỉnh</h3><p>Chưa khả dụng.</p></section>
           </>}
         </div>
