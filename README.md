@@ -1,21 +1,23 @@
 # FujiFrame AI
 
-FujiFrame AI is a local photography workspace with a light editorial Gallery, a dark Studio and a browser-local Color Lab. The Gallery stores multiple JPEG, PNG and WebP originals in IndexedDB and displays thumbnails in a responsive masonry layout. It reads available camera EXIF locally and supports manually entered photo journals, collection filtering and Film Recipes. The Studio reads one JPEG or PNG through the local FastAPI service. Switching views preserves the Studio selection, and both Gallery and Studio support a lightbox. Color Lab previews Exposure and Contrast adjustments; image export is not implemented yet.
+FujiFrame AI is a local photography workspace with a light editorial Gallery, a dark Studio and a browser-local Color Lab. The Gallery stores multiple JPEG, PNG and WebP originals in IndexedDB and displays thumbnails in a responsive masonry layout. It reads available camera EXIF locally and supports manually entered photo journals, collection filtering and Film Recipes. The Studio reads one JPEG or PNG through the local FastAPI service. Switching views preserves the Studio selection, and both Gallery and Studio support a lightbox. Color Lab offers non-destructive preview adjustments and PNG export.
 
 ## Current progress
 
 - Phase 1 foundation: local Gallery import and storage, thumbnails, loading/error states, and available camera/lens/exposure EXIF. Responsive CSS is present; visual regression verification is still pending.
 - Phase 2 in progress: Gallery lightbox with previous/next controls, manual photo journals, collection assignment/filtering and manual Film Recipes. Dedicated local photo pages are available; further portfolio polish remains future work.
 - Phase 3 in progress: Studio reports histogram, exposure, contrast, color and reference sharpness metrics, with explainable editing suggestions. Applying edits and machine-learning models are not implemented.
-- Phase 4 started: separate Color Lab preview with Exposure, Contrast, Before/After and Reset. Export and additional controls remain future work.
+- Phase 4: Color Lab preview with tonal and color adjustments, HSL bands, Tone Curve points, Film Grain, style presets, Before/After, Reset and PNG export. Advanced RAW editing and full-resolution export are not supported.
 
 ### Color Lab preview
 
 Open **Color Lab** and choose or drop one JPEG, PNG or WebP (up to 32 MiB / 64 MP). Processing stays in the browser and does not call the Backend. The preview preserves the aspect ratio and is limited to 1600 pixels on the longest edge. Browser decoding determines orientation/color conversion and the displayed frame for animated formats. The working canvas uses 8-bit sRGB; this is not a RAW or wide-gamut editor.
 
-Exposure (-3 to +3 EV) decodes sRGB channels to linear light, multiplies by `2^EV`, clips to [0,1], and re-encodes to sRGB. Contrast (-100 to +100) then applies a slope of `2^(contrast/100)` around encoded midpoint 0.5, followed by clipping. Alpha remains unchanged. These are simple project controls, not an exact match for another editor or Fujifilm processing. Clipped highlights are not recovered.
+Exposure (-3 to +3 EV) decodes sRGB channels to linear light, multiplies by `2^EV`, clips to [0,1], and re-encodes to sRGB. Contrast (-100 to +100) then applies a slope of `2^(contrast/100)` around encoded midpoint 0.5, followed by clipping. Highlights/Shadows use luminance-weighted offsets; Temperature/Tint use simple channel shifts. Saturation/Vibrance and the eight HSL bands operate in HSL space. The three Tone Curve controls change output at 25%, 50% and 75%, with linear interpolation between control points. Film Grain adds deterministic monochrome noise. Alpha remains unchanged. These are project controls, not an exact match for Photoshop or Fujifilm processing. Clipped highlights are not recovered.
 
-Every adjustment starts from the same unedited preview pixels. **Xem trước chỉnh sửa** temporarily shows those pixels; changing a slider returns to the edited view. **Reset** restores both controls to zero. Switching tabs preserves the current session; replacing/removing the image or reloading clears edits. Preview adjustments do not update Studio analysis or Gallery data. Original image bytes and metadata are never rewritten. Export is not available yet.
+The optional Classic Chrome-inspired and Velvia-inspired presets are artistic approximations, not reproductions of Fujifilm's proprietary rendering. Choosing a preset starts from neutral settings; moving a slider makes it a custom edit.
+
+Every adjustment starts from the same unedited preview pixels. **Xem trước** temporarily shows those pixels; changing a slider returns to the edited view. **Reset** restores every control to zero. Switching tabs preserves the current session; replacing/removing the image or reloading clears edits. Preview adjustments do not update Studio analysis or Gallery data. Original image bytes and metadata are never rewritten. **Export PNG** downloads the adjusted preview, even while Before is displayed. Export is limited to the preview resolution (longest edge at most 1600 px), contains no original EXIF, and does not replace the source file.
 
 Open a Gallery photo, scroll below the image, and choose **Chỉnh sửa nhật ký** to enter a title, collection, location or description. **Lưu nhật ký** persists these fields in the browser; **Hủy** discards the form draft. Each photo can belong to one named collection; the Gallery filter lists collections that currently contain photos. Empty titles fall back to the original filename. Journal values are explicitly user-entered and stored separately from extracted EXIF; saving a journal never rewrites the original image. Save before navigating to another photo or closing the lightbox. Other open Gallery tabs are notified after saving.
 
@@ -89,7 +91,7 @@ The upload response includes `recommendations`, each with `id`, `title`, `reason
 
 These are project heuristics, not photography standards or defect diagnoses. Reasons show measurements and thresholds. No recovery of clipped detail is promised. White balance and sharpening suggestions are intentionally not inferred from channel means or neighbor differences. Suggestions inherit the measurement limitations described below.
 
-The Studio lets you dismiss and restore suggestions for the current result; changing the image or reloading clears that choice. Empty suggestions do not imply a perfect image. Nothing is automatically applied or saved to the original. Color Lab currently offers independent Exposure/Contrast previews; it does not apply Studio suggestions.
+The Studio lets you dismiss and restore suggestions for the current result; changing the image or reloading clears that choice. Empty suggestions do not imply a perfect image. Nothing is automatically applied or saved to the original. Color Lab offers independent tonal and color previews; Studio suggestions are not applied automatically.
 
 ### Studio sharpness reference
 

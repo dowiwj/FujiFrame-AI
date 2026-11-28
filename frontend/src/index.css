@@ -100,7 +100,22 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(44px, 5
 .lab-controls output { float: right; font-variant-numeric: tabular-nums; }
 .lab-controls input[type="range"] { display: block; width: 100%; margin: 14px 0; accent-color: #ddd; min-height: 32px; }
 .lab-controls input:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.lab-group { border-top: 1px solid var(--line); padding-top: 20px; margin-top: 14px; }
+.lab-group h3 { font-size: 13px; font-weight: 500; margin: 0 0 22px; }
+.lab-slider { display: block; font-size: 13px; margin-bottom: 18px !important; }
+.lab-slider > span { display: flex; justify-content: space-between; gap: 16px; }
+.lab-slider output { float: none; color: var(--muted); }
+.lab-hue-select { display: flex !important; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px !important; }
+.lab-hue-select select { min-width: 130px; min-height: 40px; border: 1px solid var(--line); background: var(--stage); color: var(--text); padding: 7px 10px; font: inherit; }
+.lab-hue-select select:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.lab-actions { border-top: 1px solid var(--line); padding-top: 22px; }
+.lab-actions button { flex: 1 1 auto; }
 .color-lab .panel-heading h2 { overflow-wrap: anywhere; min-width: 0; }
+.color-lab .viewer, .color-lab .inspector { align-self: start; position: sticky; top: 12px; }
+.color-lab .inspector { max-height: calc(100dvh - 24px); overflow-y: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; }
+.color-lab .stage { min-height: min(480px, calc(100dvh - 180px)); }
+.color-lab .stage.has-photo { min-height: 0; }
+.color-lab .preview-image { max-height: min(70dvh, calc(100dvh - 180px)); }
 @media (max-width: 500px) { .site-header { flex-wrap: wrap; padding-block: 16px; } .site-header nav { width: 100%; justify-content: space-between; } }
 .recommendations-panel { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 18px; }
 .recommendations-panel h3, .recommendations-panel h4 { font-size: 14px; font-weight: 500; margin: 0 0 12px; }
@@ -153,6 +168,13 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(44px, 5
   .theme-studio .workbench { grid-template-columns: minmax(0, 1fr); }
   .theme-studio .stage { min-height: 350px; }
   .theme-studio .inspector { border-left: 0; padding: 0; }
+  .color-lab .viewer { position: static; }
+  .color-lab.has-source .viewer { position: sticky; top: 0; z-index: 1; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .color-lab .inspector { position: static; max-height: none; overflow: visible; scrollbar-gutter: auto; }
+  .color-lab .stage { min-height: 240px; }
+  .color-lab .stage.has-photo { min-height: 0; }
+  .color-lab .preview-image { max-height: 34dvh; }
+  .color-lab .session-note { margin: 10px 0; }
   .metadata { grid-template-columns: 1fr 1fr; }
   .site-footer { flex-direction: column; gap: 10px; margin-top: 40px; }
 }
