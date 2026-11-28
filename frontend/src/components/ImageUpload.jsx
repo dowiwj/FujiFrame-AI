@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { inspectImage } from "../services/images.js";
 import PhotoLightbox from "./PhotoLightbox.jsx";
 import HistogramPanel from "./HistogramPanel.jsx";
+import RecommendationsPanel from "./RecommendationsPanel.jsx";
 
 const MAX_FILE_BYTES = 32 * 1024 * 1024;
 const number = new Intl.NumberFormat("vi-VN");
@@ -170,7 +171,7 @@ export default function ImageUpload({ view }) {
           {view === "studio" && <>
             <p className="inspector-note">Camera, lens và thông số chụp chưa được hỗ trợ. Ảnh gốc được giữ nguyên.</p>
             <HistogramPanel analysis={metadata?.analysis} loading={loading} error={error} />
-            <section className="future-section"><h3>Điều chỉnh</h3><p>Chưa khả dụng.</p></section>
+            {metadata && !loading && !error && <RecommendationsPanel key={selection?.url} recommendations={metadata.recommendations} />}
           </>}
         </div>
       </section>

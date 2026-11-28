@@ -95,6 +95,18 @@ h1 { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(44px, 5
 .tone-values > div { display: flex; justify-content: space-between; gap: 12px; margin: 12px 0; font-size: 13px; }
 .tone-values dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
 .tone-values small { display: block; color: var(--muted); font-size: 11px; margin-top: 4px; }
+.lab-controls { border: 0; padding: 20px 0; margin: 0; min-width: 0; }
+.lab-controls label { display: block; font-size: 14px; margin-bottom: 28px; }
+.lab-controls output { float: right; font-variant-numeric: tabular-nums; }
+.lab-controls input[type="range"] { display: block; width: 100%; margin: 14px 0; accent-color: #ddd; min-height: 32px; }
+.lab-controls input:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.color-lab .panel-heading h2 { overflow-wrap: anywhere; min-width: 0; }
+@media (max-width: 500px) { .site-header { flex-wrap: wrap; padding-block: 16px; } .site-header nav { width: 100%; justify-content: space-between; } }
+.recommendations-panel { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 18px; }
+.recommendations-panel h3, .recommendations-panel h4 { font-size: 14px; font-weight: 500; margin: 0 0 12px; }
+.recommendations-panel p { color: var(--muted); font-size: 12px; line-height: 1.7; margin: 12px 0; }
+.recommendation-list { list-style: none; margin: 0; padding: 0; }
+.recommendation-list li { border-top: 1px solid var(--line); margin: 20px 0; padding-top: 16px; overflow-wrap: anywhere; }
 .lightbox { --line: #424443; --muted: #b5b5b0; background: #161718; color: #eee; width: min(1300px, 94vw); max-height: 94dvh; margin: auto; padding: 22px; border: 1px solid var(--line); }
 .lightbox::backdrop { background: #000d; }
 .lightbox-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 20px; font-size: 13px; margin-bottom: 20px; }

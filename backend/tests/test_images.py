@@ -35,6 +35,8 @@ def test_metadata_comes_from_file_contents(client, image_format):
     assert response.status_code == 200
     result = response.json()
     analysis = result.pop("analysis")
+    recommendations = result.pop("recommendations")
+    assert isinstance(recommendations, list)
     assert analysis["pixel_count"] == 1200
     exposure = analysis["exposure"]
     assert sum(exposure[band]["pixel_count"] for band in (

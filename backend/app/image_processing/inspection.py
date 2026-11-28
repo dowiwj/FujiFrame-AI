@@ -5,6 +5,7 @@ from typing import BinaryIO
 from PIL import Image, UnidentifiedImageError
 
 from .histogram import HistogramAnalysis, analyze_histogram
+from ..services.recommendations import Recommendation, suggest_adjustments
 
 MAX_FILE_BYTES = 32 * 1024 * 1024
 MAX_PIXELS = 64_000_000
@@ -30,6 +31,7 @@ class ImageMetadata:
     height: int
     size_bytes: int
     analysis: HistogramAnalysis
+    recommendations: list[Recommendation]
 
 
 def inspect_image(stream: BinaryIO) -> ImageMetadata:
@@ -62,4 +64,7 @@ def inspect_image(stream: BinaryIO) -> ImageMetadata:
     except (OSError, SyntaxError, ValueError) as error:
         raise InvalidImageError("Tệp ảnh bị hỏng hoặc thiếu dữ liệu.") from error
 
-    return ImageMetadata(image_format, width, height, size_bytes, analysis)
+    return ImageMetadata(
+        image_format, width, height, size_bytes, analysis,
+        suggest_adjustments(analysis),
+    )

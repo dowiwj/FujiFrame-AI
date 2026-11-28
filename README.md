@@ -1,12 +1,21 @@
 # FujiFrame AI
 
-FujiFrame AI is a local photography workspace with a light editorial Gallery and a dark Studio. The Gallery stores multiple JPEG, PNG and WebP originals in IndexedDB and displays thumbnails in a responsive masonry layout. It reads available camera EXIF locally and supports manually entered photo journals, collection filtering and Film Recipes. The Studio reads one JPEG or PNG through the local FastAPI service. Switching views preserves the Studio selection, and both views support a lightbox. The Studio displays RGB/luma histograms and mean brightness. Image editing is not implemented yet.
+FujiFrame AI is a local photography workspace with a light editorial Gallery, a dark Studio and a browser-local Color Lab. The Gallery stores multiple JPEG, PNG and WebP originals in IndexedDB and displays thumbnails in a responsive masonry layout. It reads available camera EXIF locally and supports manually entered photo journals, collection filtering and Film Recipes. The Studio reads one JPEG or PNG through the local FastAPI service. Switching views preserves the Studio selection, and both Gallery and Studio support a lightbox. Color Lab previews Exposure and Contrast adjustments; image export is not implemented yet.
 
 ## Current progress
 
 - Phase 1 foundation: local Gallery import and storage, thumbnails, loading/error states, and available camera/lens/exposure EXIF. Responsive CSS is present; visual regression verification is still pending.
 - Phase 2 in progress: Gallery lightbox with previous/next controls, manual photo journals, collection assignment/filtering and manual Film Recipes. Dedicated local photo pages are available; further portfolio polish remains future work.
-- Phase 3 in progress: Studio reports format, dimensions, file size, RGB/luma histograms, mean brightness, near-black/white ratios, shadows/midtones/highlights distribution, global luma contrast, mean RGB and HSV saturation statistics. Editing suggestions and machine-learning models are not implemented.
+- Phase 3 in progress: Studio reports histogram, exposure, contrast, color and reference sharpness metrics, with explainable editing suggestions. Applying edits and machine-learning models are not implemented.
+- Phase 4 started: separate Color Lab preview with Exposure, Contrast, Before/After and Reset. Export and additional controls remain future work.
+
+### Color Lab preview
+
+Open **Color Lab** and choose or drop one JPEG, PNG or WebP (up to 32 MiB / 64 MP). Processing stays in the browser and does not call the Backend. The preview preserves the aspect ratio and is limited to 1600 pixels on the longest edge. Browser decoding determines orientation/color conversion and the displayed frame for animated formats. The working canvas uses 8-bit sRGB; this is not a RAW or wide-gamut editor.
+
+Exposure (-3 to +3 EV) decodes sRGB channels to linear light, multiplies by `2^EV`, clips to [0,1], and re-encodes to sRGB. Contrast (-100 to +100) then applies a slope of `2^(contrast/100)` around encoded midpoint 0.5, followed by clipping. Alpha remains unchanged. These are simple project controls, not an exact match for another editor or Fujifilm processing. Clipped highlights are not recovered.
+
+Every adjustment starts from the same unedited preview pixels. **Xem trước chỉnh sửa** temporarily shows those pixels; changing a slider returns to the edited view. **Reset** restores both controls to zero. Switching tabs preserves the current session; replacing/removing the image or reloading clears edits. Preview adjustments do not update Studio analysis or Gallery data. Original image bytes and metadata are never rewritten. Export is not available yet.
 
 Open a Gallery photo, scroll below the image, and choose **Chỉnh sửa nhật ký** to enter a title, collection, location or description. **Lưu nhật ký** persists these fields in the browser; **Hủy** discards the form draft. Each photo can belong to one named collection; the Gallery filter lists collections that currently contain photos. Empty titles fall back to the original filename. Journal values are explicitly user-entered and stored separately from extracted EXIF; saving a journal never rewrites the original image. Save before navigating to another photo or closing the lightbox. Other open Gallery tabs are notified after saving.
 
@@ -69,6 +78,19 @@ The following is a metadata-only excerpt from an earlier JPEG check. Responses n
 
 ## Verify the project
 
+### Explainable editing suggestions
+
+The upload response includes `recommendations`, each with `id`, `title`, `reason` and `consideration`. Rules live separately in `backend/app/services/recommendations.py`. They suggest directions, not editor-specific slider values:
+
+- Near-black fraction at least 10%: consider lifting Shadows if darker tones are not intentional.
+- Near-white fraction at least 10%: consider lowering Highlights if brighter tones are not intentional.
+- Luma P5–P95 span strictly between 0 and 60, and standard deviation below 20: consider a small Contrast increase.
+- Mean HSV saturation strictly between 0 and 15%: consider a small Saturation increase. Exactly monochrome images receive no saturation prompt.
+
+These are project heuristics, not photography standards or defect diagnoses. Reasons show measurements and thresholds. No recovery of clipped detail is promised. White balance and sharpening suggestions are intentionally not inferred from channel means or neighbor differences. Suggestions inherit the measurement limitations described below.
+
+The Studio lets you dismiss and restore suggestions for the current result; changing the image or reloading clears that choice. Empty suggestions do not imply a perfect image. Nothing is automatically applied or saved to the original. Color Lab currently offers independent Exposure/Contrast previews; it does not apply Studio suggestions.
+
 ### Studio sharpness reference
 
 `analysis.sharpness` contains `rms_neighbor_difference` (0–255 or null) and `pair_count`. It measures the square root of the mean squared luma difference across horizontal and vertical neighbors, without resizing. Pairs crossing 1024-pixel tile boundaries are omitted; this keeps intermediate memory bounded. Grayscale 16-bit and images without any neighbor pairs return null rather than a fabricated zero. Other modes use the existing 8-bit, white-composited luma conversion.
@@ -79,7 +101,7 @@ This is a global detail indicator, not a focus verdict or quality score. Noise, 
 
 `analysis.color` contains `mean_red`, `mean_green`, `mean_blue` (0–255), `mean_saturation` (0–1), and `saturation` (256 integer counts). Saturation is measured for each pixel using Pillow's 8-bit HSV conversion, then averaged; it is not computed from average RGB. In HSV, S is `(max(R,G,B) - min(R,G,B)) / max(R,G,B)`, or zero for black, quantized to 8-bit. Grayscale has zero saturation. Every pixel has equal weight. Opposing saturated colors can have a neutral RGB average, so channel means are not a white-balance diagnosis.
 
-The existing tile loop accumulates saturation after compositing alpha on white. It does not decode the image a second time, install another dependency or modify originals. The same ICC, initial-frame and 16-bit limitations apply as for the luma histogram. Neither a channel imbalance nor low saturation is automatically considered an error. No color correction is suggested or applied.
+The existing tile loop accumulates saturation after compositing alpha on white. It does not decode the image a second time, install another dependency or modify originals. The same ICC, initial-frame and 16-bit limitations apply as for the luma histogram. Neither a channel imbalance nor low saturation is automatically considered an error. Optional saturation suggestions use the separate rules above; no correction is applied.
 
 ### Studio contrast analysis
 
@@ -93,7 +115,7 @@ The upload response adds `analysis`: `red`, `green`, `blue` and `brightness` (25
 
 Brightness uses Pillow's rounded BT.601 luma, `Y′ = 0.299R + 0.587G + 0.114B`. The mean is the sum of each level multiplied by its count, divided by the number of pixels. This is encoded luma, not linear-light luminance or an artistic quality score. See the [Pillow conversion documentation](https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.Image.convert).
 
-Alpha and transparency keys are composited on white for measurement; the dark preview can look different. Grayscale 16-bit PNG values are reduced to 8-bit with a fixed scale, without auto-stretching. Other formats use Pillow's decoded 8-bit channels. Embedded ICC profiles are not transformed, so wide-gamut and CMYK measurements can differ from a color-managed preview. Animated PNG analysis covers only the initial frame. Each chart uses its own peak for the vertical scale, with that peak labeled. This is deterministic image processing, not machine learning; no editing suggestions are generated yet.
+Alpha and transparency keys are composited on white for measurement; the dark preview can look different. Grayscale 16-bit PNG values are reduced to 8-bit with a fixed scale, without auto-stretching. Other formats use Pillow's decoded 8-bit channels. Embedded ICC profiles are not transformed, so wide-gamut and CMYK measurements can differ from a color-managed preview. Animated PNG analysis covers only the initial frame. Each chart uses its own peak for the vertical scale, with that peak labeled. This is deterministic image processing, not machine learning; suggestions are generated separately from these measurements.
 
 ### Tone distribution
 
